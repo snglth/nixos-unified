@@ -23,6 +23,12 @@ let
       ];
     };
 
+    colmena = {
+      extraModules = [
+        inputs.colmena.nixosModules.deploymentOptions
+      ];
+    };
+
     # Common and useful setting across all platforms
     common = { lib, ... }: {
       nix = {
@@ -73,14 +79,15 @@ in
       nixos-unified.lib = {
         inherit specialArgsFor;
 
-        mkLinuxSystem = { home-manager ? false }: mod: inputs.nixpkgs.lib.nixosSystem {
+        mkLinuxSystem = { home-manager ? false, colmena ? false }: mod: inputs.nixpkgs.lib.nixosSystem {
           # Arguments to pass to all modules.
           specialArgs = specialArgsFor.nixos;
           modules = [
             ../configurations
             nixosModules.common
             mod
-          ] ++ lib.optional home-manager nixosModules.home-manager;
+          ] ++ lib.optional home-manager nixosModules.home-manager
+            ++ lib.optional colmena nixosModules.colmena;
         };
 
         mkMacosSystem = { home-manager ? false }: mod: inputs.nix-darwin.lib.darwinSystem {
